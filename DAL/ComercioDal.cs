@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace ComercioDigitalDemoAPI.DAL
 {
@@ -10,7 +11,7 @@ namespace ComercioDigitalDemoAPI.DAL
     {
         public ComercioDal(bool usarTransacao) : base(usarTransacao) { }
 
-        public Guid IncluirProduto(Produto produto)
+        public async Task<object> IncluirProduto(Produto produto)
         {
             string sql = @"insert into Produtos (Id, Nome, Valor) OUTPUT inserted.Id
                            values (NEWID(), @nome, @valor)";
@@ -18,10 +19,10 @@ namespace ComercioDigitalDemoAPI.DAL
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("nome", produto.Nome);
             cmd.Parameters.AddWithValue("valor", produto.Valor);
-            return (Guid)cmd.ExecuteScalar();
+            return await cmd.ExecuteScalarAsync();
         }
 
-        public Guid IncluirCliente(Cliente cliente)
+        public async Task<object> IncluirCliente(Cliente cliente)
         {
             string sql = @"insert into Clientes (Id, Nome, Email, Telefone) OUTPUT inserted.Id 
                            values (NEWID(), @nome, @email, @telefone)";
@@ -30,17 +31,17 @@ namespace ComercioDigitalDemoAPI.DAL
             cmd.Parameters.AddWithValue("nome", cliente.Nome);
             cmd.Parameters.AddWithValue("email", cliente.Email);
             cmd.Parameters.AddWithValue("telefone", cliente.Telefone);
-            return (Guid)cmd.ExecuteScalar();
+            return await cmd.ExecuteScalarAsync();
         }
 
-        public int ObterNovoNumeroPedido()
+        public async Task<int> ObterNovoNumeroPedido()
         {
             string query = "select coalesce(max([Numero]), 0) + 1 as Numero from Pedidos";
             using SqlCommand cmd = new SqlCommand(query, Conexao);
-            return Convert.ToInt32(cmd.ExecuteScalar());
+            return Convert.ToInt32(await cmd.ExecuteScalarAsync());
         }
 
-        public Guid IncluirPedido(Pedido pedido)
+        public async Task<object> IncluirPedido(Pedido pedido)
         {
             string sql = @"insert into Pedidos (Id, Titulo, Numero, ClienteId) OUTPUT inserted.Id 
                            values (NEWID(), @titulo, @numero, @clienteId)";
@@ -49,10 +50,10 @@ namespace ComercioDigitalDemoAPI.DAL
             cmd.Parameters.AddWithValue("titulo", pedido.Titulo);
             cmd.Parameters.AddWithValue("numero", pedido.Numero);
             cmd.Parameters.AddWithValue("clienteId", pedido.ClienteId);
-            return (Guid)cmd.ExecuteScalar();
+            return await cmd.ExecuteScalarAsync();
         }
 
-        public List<Pedido> ListarPedidos()
+        public async Task<List<Pedido>> ListarPedidos()
         {
             List<Pedido> pedidos = new List<Pedido>();
 
@@ -61,7 +62,7 @@ namespace ComercioDigitalDemoAPI.DAL
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
 
             foreach (DataRow row in retornoQuery.Rows)
             {
@@ -71,7 +72,7 @@ namespace ComercioDigitalDemoAPI.DAL
             return pedidos;
         }
 
-        public Pedido ObterPedido(Guid id)
+        public async Task<Pedido> ObterPedido(Guid id)
         {
             Pedido pedido;
 
@@ -80,31 +81,31 @@ namespace ComercioDigitalDemoAPI.DAL
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
             pedido = retornoQuery.Rows[0];
             return pedido;
         }
 
-        public void AlterarPedido(Pedido pedido)
+        public async void AlterarPedido(Pedido pedido)
         {
             string sql = @"update Pedidos set Titulo = @titulo where Id = @id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", pedido.Id);
             cmd.Parameters.AddWithValue("titulo", pedido.Titulo);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public void DeletarPedido(Guid id)
+        public async void DeletarPedido(Guid id)
         {
             string sql = @"delete from Pedidos where Id = @id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public Guid IncluirItemPedido(ItemPedido itemPedido)
+        public async Task<object> IncluirItemPedido(ItemPedido itemPedido)
         {
             string sql = @"insert into ItensPedido (Id, PedidoId, ProdutoId, Quantidade) OUTPUT inserted.Id
                            values (NEWID(), @pedidoId, @produtoId, @quantidade)";
@@ -113,10 +114,10 @@ namespace ComercioDigitalDemoAPI.DAL
             cmd.Parameters.AddWithValue("pedidoId", itemPedido.PedidoId);
             cmd.Parameters.AddWithValue("produtoId", itemPedido.ProdutoId);
             cmd.Parameters.AddWithValue("quantidade", itemPedido.Quantidade);
-            return (Guid)cmd.ExecuteScalar();
+            return await cmd.ExecuteScalarAsync();
         }
 
-        public List<Produto> ListarProdutos()
+        public async Task<List<Produto>> ListarProdutos()
         {
             List<Produto> produtos = new List<Produto>();
 
@@ -124,7 +125,7 @@ namespace ComercioDigitalDemoAPI.DAL
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
 
             foreach (DataRow row in retornoQuery.Rows)
             {
@@ -134,7 +135,7 @@ namespace ComercioDigitalDemoAPI.DAL
             return produtos;
         }
 
-        public Produto ObterProduto(Guid id)
+        public async Task<Produto> ObterProduto(Guid id)
         {
             Produto produto;
 
@@ -143,12 +144,12 @@ namespace ComercioDigitalDemoAPI.DAL
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
             produto = retornoQuery.Rows[0];
             return produto;
         }
 
-        public void AlterarProduto(Produto produto)
+        public async void AlterarProduto(Produto produto)
         {
             string sql = @"update Produtos set Nome = @nome, Valor = @valor where Id = @id";
 
@@ -156,19 +157,19 @@ namespace ComercioDigitalDemoAPI.DAL
             cmd.Parameters.AddWithValue("id", produto.Id);
             cmd.Parameters.AddWithValue("nome", produto.Nome);
             cmd.Parameters.AddWithValue("valor", produto.Valor);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public void DeletarProduto(Guid id)
+        public async void DeletarProduto(Guid id)
         {
             string sql = @"delete from Produtos where Id = @id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public List<Cliente> ListarClientes()
+        public async Task<List<Cliente>> ListarClientes()
         {
             List<Cliente> cliente = new List<Cliente>();
 
@@ -176,7 +177,7 @@ namespace ComercioDigitalDemoAPI.DAL
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
 
             foreach (DataRow row in retornoQuery.Rows)
             {
@@ -186,7 +187,7 @@ namespace ComercioDigitalDemoAPI.DAL
             return cliente;
         }
 
-        public Cliente ObterCliente(Guid id)
+        public async Task<Cliente> ObterCliente(Guid id)
         {
             Cliente cliente;
 
@@ -195,12 +196,12 @@ namespace ComercioDigitalDemoAPI.DAL
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
             cliente = retornoQuery.Rows[0];
             return cliente;
         }
 
-        public void AlterarCliente(Cliente cliente)
+        public async void AlterarCliente(Cliente cliente)
         {
             string sql = @"update Clientes set Nome = @nome, Email = @email, Telefone = @telefone where Id = @id";
 
@@ -209,19 +210,19 @@ namespace ComercioDigitalDemoAPI.DAL
             cmd.Parameters.AddWithValue("id", cliente.Id);
             cmd.Parameters.AddWithValue("email", cliente.Email);
             cmd.Parameters.AddWithValue("telefone", cliente.Telefone);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public void DeletarCliente(Guid id)
+        public async void DeletarCliente(Guid id)
         {
             string sql = @"delete from Clientes where Id = @id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public ItemPedido ObterItemPedido(Guid id)
+        public async Task<ItemPedido> ObterItemPedido(Guid id)
         {
             ItemPedido itemPedido;
 
@@ -233,7 +234,7 @@ namespace ComercioDigitalDemoAPI.DAL
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
             itemPedido = retornoQuery.Rows[0];
             return itemPedido;
         }
@@ -258,7 +259,7 @@ namespace ComercioDigitalDemoAPI.DAL
             return pedidos;
         }
 
-        public List<ItemPedido> ListarItensPorPedido(Guid pedidoId)
+        public async Task<List<ItemPedido>> ListarItensPorPedido(Guid pedidoId)
         {
             List<ItemPedido> pedidos = new List<ItemPedido>();
 
@@ -270,7 +271,7 @@ namespace ComercioDigitalDemoAPI.DAL
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("pedidoId", pedidoId);
             using DataTable retornoQuery = new DataTable();
-            retornoQuery.Load(cmd.ExecuteReader());
+            retornoQuery.Load(await cmd.ExecuteReaderAsync());
 
             foreach (DataRow row in retornoQuery.Rows)
             {
@@ -280,13 +281,13 @@ namespace ComercioDigitalDemoAPI.DAL
             return pedidos;
         }
 
-        public void DeletarItemPedido(Guid id)
+        public async void DeletarItemPedido(Guid id)
         {
             string sql = @"delete from ItensPedido where Id = @id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 }

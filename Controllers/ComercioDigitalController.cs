@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ComercioDigitalDemoAPI.Controllers
 {
@@ -24,7 +25,7 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Route("produtos")]
-        public IActionResult IncluirProduto([FromBody] ProdutoViewModel model)
+        public async Task<IActionResult> IncluirProduto([FromBody] ProdutoViewModel model)
         {
             try
             {
@@ -36,7 +37,8 @@ namespace ComercioDigitalDemoAPI.Controllers
                     Valor = Math.Truncate(model.Valor)
                 };
 
-                produto.Id = comercioDal.IncluirProduto(produto);
+                var id = await comercioDal.IncluirProduto(produto);
+                produto.Id = (Guid)id;
                 return Created($"v1/produtos/{produto.Id}", produto);
             }
             catch (Exception)
@@ -47,12 +49,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("produtos")]
-        public IActionResult ListarProdutos()
+        public async Task<IActionResult> ListarProdutos()
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                List<Produto> produtos = comercioDal.ListarProdutos();
+                var produtos = await comercioDal.ListarProdutos();
                 return Ok(produtos);
             }
             catch (Exception)
@@ -63,12 +65,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("produtos/{id}")]
-        public IActionResult ObterProduto([FromRoute] Guid id)
+        public async Task<IActionResult> ObterProduto([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Produto produto = comercioDal.ObterProduto(id);
+                var produto = await comercioDal.ObterProduto(id);
                 return Ok(produto);
             }
             catch (Exception)
@@ -80,12 +82,12 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPut]
         [Consumes("application/json")]
         [Route("produtos/{id}")]
-        public IActionResult AlterarProduto([FromBody] ProdutoViewModel model, [FromRoute] Guid id)
+        public async Task<IActionResult> AlterarProduto([FromBody] ProdutoViewModel model, [FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Produto produto = comercioDal.ObterProduto(id);
+                Produto produto = await comercioDal.ObterProduto(id);
 
                 if (produto == null) return NotFound();
 
@@ -102,12 +104,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpDelete]
         [Route("produtos/{id}")]
-        public IActionResult DeletarProduto([FromRoute] Guid id)
+        public async Task<IActionResult> DeletarProduto([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Produto produto = comercioDal.ObterProduto(id);
+                Produto produto = await comercioDal.ObterProduto(id);
 
                 if (produto == null) return NotFound();
 
@@ -127,7 +129,7 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Route("clientes")]
-        public IActionResult IncluirCliente([FromBody] ClienteViewModel model)
+        public async Task<IActionResult> IncluirCliente([FromBody] ClienteViewModel model)
         {
             try
             {
@@ -140,7 +142,8 @@ namespace ComercioDigitalDemoAPI.Controllers
                     Telefone = model.Telefone
                 };
 
-                cliente.Id = comercioDal.IncluirCliente(cliente);
+                var id = await comercioDal.IncluirCliente(cliente);
+                cliente.Id = (Guid)id;
                 return Created($"v1/clientes/{cliente.Id}", cliente);
             }
             catch (Exception)
@@ -151,12 +154,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("clientes")]
-        public IActionResult ListarClientes()
+        public async Task<IActionResult> ListarClientes()
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                List<Cliente> clientes = comercioDal.ListarClientes();
+                List<Cliente> clientes = await comercioDal.ListarClientes();
                 return Ok(clientes);
             }
             catch (Exception)
@@ -167,12 +170,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("clientes/{id}")]
-        public IActionResult ObterCliente([FromRoute] Guid id)
+        public async Task<IActionResult> ObterCliente([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Cliente cliente = comercioDal.ObterCliente(id);
+                Cliente cliente = await comercioDal.ObterCliente(id);
                 return Ok(cliente);
             }
             catch (Exception)
@@ -184,12 +187,12 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPut]
         [Consumes("application/json")]
         [Route("clientes/{id}")]
-        public IActionResult AlterarCliente([FromBody] ClienteViewModel model, [FromRoute] Guid id)
+        public async Task<IActionResult> AlterarCliente([FromBody] ClienteViewModel model, [FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Cliente cliente = comercioDal.ObterCliente(id);
+                Cliente cliente = await comercioDal.ObterCliente(id);
 
                 if (cliente == null) return NotFound();
 
@@ -207,12 +210,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpDelete]
         [Route("clientes/{id}")]
-        public IActionResult DeletarCliente([FromRoute] Guid id)
+        public async Task<IActionResult> DeletarCliente([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Cliente cliente = comercioDal.ObterCliente(id);
+                Cliente cliente = await comercioDal.ObterCliente(id);
 
                 if (cliente == null) return NotFound();
 
@@ -232,7 +235,7 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Route("pedidos")]
-        public IActionResult IncluirPedido([FromBody] PedidoViewModel model)
+        public async Task<IActionResult> IncluirPedido([FromBody] PedidoViewModel model)
         {
             try
             {
@@ -241,11 +244,12 @@ namespace ComercioDigitalDemoAPI.Controllers
                 Pedido pedido = new Pedido
                 {
                     Titulo = model.Titulo,
-                    Numero = comercioDal.ObterNovoNumeroPedido(),
+                    Numero = await comercioDal.ObterNovoNumeroPedido(),
                     ClienteId = model.ClienteId
                 };
 
-                pedido.Id = comercioDal.IncluirPedido(pedido);
+                var id = await comercioDal.IncluirPedido(pedido);
+                pedido.Id = (Guid)id;
                 return Created($"v1/pedidos/{pedido.Id}", pedido);
             }
             catch (Exception)
@@ -256,12 +260,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("pedidos")]
-        public IActionResult ListarPedidos()
+        public async Task<IActionResult> ListarPedidos()
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                List<Pedido> pedidos = comercioDal.ListarPedidos();
+                List<Pedido> pedidos = await comercioDal.ListarPedidos();
                 return Ok(pedidos);
             }
             catch (Exception)
@@ -272,12 +276,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("pedidos/{id}")]
-        public IActionResult ObterPedido([FromRoute] Guid id)
+        public async Task<IActionResult> ObterPedido([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Pedido pedido = comercioDal.ObterPedido(id);
+                Pedido pedido = await comercioDal.ObterPedido(id);
                 return Ok(pedido);
             }
             catch (Exception)
@@ -289,12 +293,12 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPut]
         [Consumes("application/json")]
         [Route("pedidos/{id}")]
-        public IActionResult AlterarPedido([FromBody] string titulo, [FromRoute] Guid id)
+        public async Task<IActionResult> AlterarPedido([FromBody] string titulo, [FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Pedido pedido = comercioDal.ObterPedido(id);
+                Pedido pedido = await comercioDal.ObterPedido(id);
 
                 if (pedido == null) return NotFound();
 
@@ -310,12 +314,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpDelete]
         [Route("pedidos/{id}")]
-        public IActionResult DeletarPedido([FromRoute] Guid id)
+        public async Task<IActionResult> DeletarPedido([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                Pedido pedido = comercioDal.ObterPedido(id);
+                Pedido pedido = await comercioDal.ObterPedido(id);
 
                 if (pedido == null) return NotFound();
 
@@ -335,7 +339,7 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Route("itens")]
-        public IActionResult IncluirItensPedido([FromBody] ItemPedidoViewModel model)
+        public async Task<IActionResult> IncluirItensPedido([FromBody] ItemPedidoViewModel model)
         {
             try
             {
@@ -348,7 +352,8 @@ namespace ComercioDigitalDemoAPI.Controllers
                     Quantidade = model.Quantidade,
                 };
 
-                itemPedido.Id = comercioDal.IncluirItemPedido(itemPedido);
+                var id = await comercioDal.IncluirItemPedido(itemPedido);
+                itemPedido.Id = (Guid)id;
                 return Ok(itemPedido);
             }
             catch (Exception)
@@ -359,12 +364,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("itens/{id}")]
-        public IActionResult ObterItemPedido([FromRoute] Guid id)
+        public async Task<IActionResult> ObterItemPedido([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                ItemPedido itemPedido = comercioDal.ObterItemPedido(id);
+                ItemPedido itemPedido = await comercioDal.ObterItemPedido(id);
                 return Ok(itemPedido);
             }
             catch (Exception)
@@ -375,12 +380,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpGet]
         [Route("itens/pedido/{pedidoId}")]
-        public IActionResult ListarItensPorPedido([FromRoute] Guid pedidoId)
+        public async Task<IActionResult> ListarItensPorPedido([FromRoute] Guid pedidoId)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                List<ItemPedido> pedidos = comercioDal.ListarItensPorPedido(pedidoId);
+                List<ItemPedido> pedidos = await comercioDal.ListarItensPorPedido(pedidoId);
                 return Ok(pedidos);
             }
             catch (Exception)
@@ -391,12 +396,12 @@ namespace ComercioDigitalDemoAPI.Controllers
 
         [HttpDelete]
         [Route("itens/{id}")]
-        public IActionResult DeletarItemPedido([FromRoute] Guid id)
+        public async Task<IActionResult> DeletarItemPedido([FromRoute] Guid id)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                ItemPedido itemPedido = comercioDal.ObterItemPedido(id);
+                ItemPedido itemPedido = await comercioDal.ObterItemPedido(id);
 
                 if (itemPedido == null) return NotFound();
 
