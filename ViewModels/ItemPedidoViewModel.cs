@@ -1,11 +1,11 @@
-﻿using ComercioDigitalDemoAPI.Models;
+﻿using System;
 
 namespace ComercioDigitalDemoAPI.ViewModels
 {
-    public abstract class ItemPedidoViewModel
+    public class ItemPedidoViewModel
     {
-        public Produto Produto { get; set; }
-        public Pedido Pedido { get; set; }
+        public Guid PedidoId { get; set; }
+        public Guid ProdutoId { get; set; }
         public int Quantidade { get; set; }
     }
 }

@@ -110,8 +110,8 @@ namespace ComercioDigitalDemoAPI.DAL
                            values (NEWID(), @pedidoId, @produtoId, @quantidade)";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao, Transacao);
-            cmd.Parameters.AddWithValue("pedidoId", itemPedido.Pedido.Id);
-            cmd.Parameters.AddWithValue("produtoId", itemPedido.Produto.Id);
+            cmd.Parameters.AddWithValue("pedidoId", itemPedido.PedidoId);
+            cmd.Parameters.AddWithValue("produtoId", itemPedido.ProdutoId);
             cmd.Parameters.AddWithValue("quantidade", itemPedido.Quantidade);
             return (Guid)cmd.ExecuteScalar();
         }
@@ -158,10 +158,10 @@ namespace ComercioDigitalDemoAPI.DAL
             cmd.Parameters.AddWithValue("valor", produto.Valor);
             cmd.ExecuteNonQuery();
         }
-        
+
         public void DeletarProduto(Guid id)
         {
-            string sql = @"delete from Clientes where Id = @id";
+            string sql = @"delete from Produtos where Id = @id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
             cmd.Parameters.AddWithValue("id", id);
@@ -202,16 +202,17 @@ namespace ComercioDigitalDemoAPI.DAL
 
         public void AlterarCliente(Cliente cliente)
         {
-            string sql = @"update Clientes set Email = @email, Telefone = @telefone where Id = @id";
+            string sql = @"update Clientes set Nome = @nome, Email = @email, Telefone = @telefone where Id = @id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
+            cmd.Parameters.AddWithValue("nome", cliente.Nome);
             cmd.Parameters.AddWithValue("id", cliente.Id);
             cmd.Parameters.AddWithValue("email", cliente.Email);
             cmd.Parameters.AddWithValue("telefone", cliente.Telefone);
             cmd.ExecuteNonQuery();
         }
 
-        public void DeletarCliente(int id)
+        public void DeletarCliente(Guid id)
         {
             string sql = @"delete from Clientes where Id = @id";
 
@@ -224,7 +225,7 @@ namespace ComercioDigitalDemoAPI.DAL
         {
             ItemPedido itemPedido;
 
-            string sql = @"select i.Id , p2.Nome, p2.Valor, i.Quantidade
+            string sql = @"select i.Id , p2.Nome, p2.Valor, i.PedidoId, i.ProdutoId, i.Quantidade
                            from ItensPedido i inner join Pedidos p1 on i.PedidoId = p1.Id
                            inner join Produtos p2 on i.ProdutoId = p2.Id
                            where i.Id = @id";
@@ -261,7 +262,7 @@ namespace ComercioDigitalDemoAPI.DAL
         {
             List<ItemPedido> pedidos = new List<ItemPedido>();
 
-            string sql = @"select i.Id , p2.Nome, p2.Valor, i.Quantidade
+            string sql = @"select i.Id , p2.Nome, p2.Valor, i.PedidoId, i.ProdutoId, i.Quantidade
                            from ItensPedido i inner join Pedidos p1 on i.PedidoId = p1.Id
                            inner join Produtos p2 on i.ProdutoId = p2.Id
                            where p1.Id = @pedidoId";

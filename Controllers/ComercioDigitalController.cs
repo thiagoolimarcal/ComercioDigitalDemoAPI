@@ -55,7 +55,7 @@ namespace ComercioDigitalDemoAPI.Controllers
                 List<Produto> produtos = comercioDal.ListarProdutos();
                 return Ok(produtos);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return StatusCode(500, "Internal Server Error.");
             }
@@ -193,6 +193,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 if (cliente == null) return NotFound();
 
+                cliente.Nome = model.Nome;
                 cliente.Email = model.Email;
                 cliente.Telefone = model.Telefone;
                 comercioDal.AlterarCliente(cliente);
@@ -215,7 +216,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 if (cliente == null) return NotFound();
 
-                comercioDal.DeletarProduto(id);
+                comercioDal.DeletarCliente(id);
                 return Ok();
             }
             catch (Exception)
@@ -288,7 +289,7 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPut]
         [Consumes("application/json")]
         [Route("pedidos/{id}")]
-        public IActionResult AlterarPedido([FromBody] PedidoViewModel model, [FromRoute] Guid id)
+        public IActionResult AlterarPedido([FromBody] string titulo, [FromRoute] Guid id)
         {
             try
             {
@@ -297,8 +298,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 if (pedido == null) return NotFound();
 
-                pedido.Titulo = model.Titulo;
-                pedido.Numero = model.Numero;
+                pedido.Titulo = titulo;
                 comercioDal.AlterarPedido(pedido);
                 return Ok(pedido);
             }
@@ -335,25 +335,23 @@ namespace ComercioDigitalDemoAPI.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Route("itens")]
-        public IActionResult IncluirItensPedido([FromBody] List<ItemPedido> model)
+        public IActionResult IncluirItensPedido([FromBody] ItemPedidoViewModel model)
         {
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(true);
 
-                List<ItemPedido> itensPedido = new List<ItemPedido>();
-
-                model.ForEach(m => itensPedido.Add(new ItemPedido
+                ItemPedido itemPedido = new ItemPedido
                 {
-                    Pedido = new Pedido { Id = m.Pedido.Id },
-                    Produto = new Produto { Id = m.Produto.Id },
-                    Quantidade = m.Quantidade,
-                }));
+                    PedidoId = model.PedidoId,
+                    ProdutoId = model.ProdutoId,
+                    Quantidade = model.Quantidade,
+                };
 
-                itensPedido.ForEach(i => i.Id = comercioDal.IncluirItemPedido(i));
-                return Ok(itensPedido);
+                itemPedido.Id = comercioDal.IncluirItemPedido(itemPedido);
+                return Ok(itemPedido);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return StatusCode(500, "Internal Server Error.");
             }

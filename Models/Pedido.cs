@@ -10,6 +10,7 @@ namespace ComercioDigitalDemoAPI.Models
     public class Pedido : PedidoViewModel
     {
         public Guid Id { get; set; }
+        public int Numero { get; set; }
 
         public static implicit operator Pedido(DataRow row)
         {
