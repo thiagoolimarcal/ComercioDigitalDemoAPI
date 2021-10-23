@@ -54,7 +54,7 @@ namespace ComercioDigitalDemoAPI.Controllers
             try
             {
                 using ComercioDal comercioDal = new ComercioDal(false);
-                var produtos = await comercioDal.ListarProdutos();
+                List<Produto> produtos = await comercioDal.ListarProdutos();
                 return Ok(produtos);
             }
             catch (Exception)
@@ -93,7 +93,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 produto.Nome = model.Nome;
                 produto.Valor = model.Valor;
-                comercioDal.AlterarProduto(produto);
+                await comercioDal.AlterarProduto(produto);
                 return Ok();
             }
             catch (Exception)
@@ -113,7 +113,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 if (produto == null) return NotFound();
 
-                comercioDal.DeletarProduto(id);
+                await comercioDal.DeletarProduto(id);
                 return Ok();
             }
             catch (Exception)
@@ -199,7 +199,7 @@ namespace ComercioDigitalDemoAPI.Controllers
                 cliente.Nome = model.Nome;
                 cliente.Email = model.Email;
                 cliente.Telefone = model.Telefone;
-                comercioDal.AlterarCliente(cliente);
+                await comercioDal.AlterarCliente(cliente);
                 return Ok(cliente);
             }
             catch (Exception)
@@ -219,7 +219,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 if (cliente == null) return NotFound();
 
-                comercioDal.DeletarCliente(id);
+                await comercioDal.DeletarCliente(id);
                 return Ok();
             }
             catch (Exception)
@@ -303,7 +303,7 @@ namespace ComercioDigitalDemoAPI.Controllers
                 if (pedido == null) return NotFound();
 
                 pedido.Titulo = titulo;
-                comercioDal.AlterarPedido(pedido);
+                await comercioDal.AlterarPedido(pedido);
                 return Ok(pedido);
             }
             catch (Exception)
@@ -323,7 +323,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 if (pedido == null) return NotFound();
 
-                comercioDal.DeletarPedido(id);
+                await comercioDal.DeletarPedido(id);
                 return Ok();
             }
             catch (Exception)
@@ -343,7 +343,7 @@ namespace ComercioDigitalDemoAPI.Controllers
         {
             try
             {
-                using ComercioDal comercioDal = new ComercioDal(true);
+                using ComercioDal comercioDal = new ComercioDal(false);
 
                 ItemPedido itemPedido = new ItemPedido
                 {
@@ -405,7 +405,7 @@ namespace ComercioDigitalDemoAPI.Controllers
 
                 if (itemPedido == null) return NotFound();
 
-                comercioDal.DeletarItemPedido(id);
+                await comercioDal.DeletarItemPedido(id);
                 return Ok();
             }
             catch (Exception)
