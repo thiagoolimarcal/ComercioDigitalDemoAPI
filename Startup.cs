@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.IO;
-using System.Reflection;
 
 namespace ComercioDigitalDemoAPI
 {
@@ -29,11 +26,6 @@ namespace ComercioDigitalDemoAPI
                     Title = "API para gestão de comércio eletrônico",
                     Version = "v1"
                 });
-
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
-                //c.IncludeXmlComments(xmlPath);
 
                 var identitySettingsSection = Configuration.GetSection("ConnectionStrings");
                 services.Configure<ConnectionStringsModel>(identitySettingsSection);
