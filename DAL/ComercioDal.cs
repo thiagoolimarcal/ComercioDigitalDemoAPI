@@ -57,7 +57,7 @@ namespace ComercioDigitalDemoAPI.DAL
         {
             List<Pedido> pedidos = new List<Pedido>();
 
-            string sql = @"select p.Id, p.Titulo, p.Numero, c.Id as ClienteId
+            string sql = @"select p.Id, p.Titulo, p.Numero, c.Id as ClienteId, c.Nome as NomeCliente
                            from Pedidos p inner join Clientes c on p.ClienteId = c.Id";
 
             using SqlCommand cmd = new SqlCommand(sql, Conexao);
@@ -226,7 +226,7 @@ namespace ComercioDigitalDemoAPI.DAL
         {
             ItemPedido itemPedido;
 
-            string sql = @"select i.Id , p2.Nome, p2.Valor, i.PedidoId, i.ProdutoId, i.Quantidade
+            string sql = @"select i.Id , p2.Nome, p2.Valor, i.PedidoId, i.ProdutoId, p1.Titulo as TituloPedido, p2.Nome as NomeProduto, i.Quantidade
                            from ItensPedido i inner join Pedidos p1 on i.PedidoId = p1.Id
                            inner join Produtos p2 on i.ProdutoId = p2.Id
                            where i.Id = @id";
@@ -262,7 +262,7 @@ namespace ComercioDigitalDemoAPI.DAL
         {
             List<ItemPedido> pedidos = new List<ItemPedido>();
 
-            string sql = @"select i.Id , p2.Nome, p2.Valor, i.PedidoId, i.ProdutoId, i.Quantidade
+            string sql = @"select i.Id, p2.Valor, i.PedidoId, i.ProdutoId, p1.Titulo as TituloPedido, p2.Nome as NomeProduto, i.Quantidade
                            from ItensPedido i inner join Pedidos p1 on i.PedidoId = p1.Id
                            inner join Produtos p2 on i.ProdutoId = p2.Id
                            where p1.Id = @pedidoId";
